@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Jeton & Chat Paneli</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #070913;
+            color: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: #0f172a;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            overflow: hidden;
+            border: 1px solid #1e293b;
+            position: relative;
+            z-index: 1;
+        }
+
+        .screen {
+            display: none;
+            padding: 24px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        h2, h3 {
+            text-align: center;
+            color: #38bdf8;
+            margin-bottom: 20px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            border: none;
+            border-radius: 12px;
+            color: #0f172a;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            opacity: 0.95;
+        }
+
+        .secondary-btn {
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            box-shadow: none;
+        }
+        .secondary-btn:hover {
+            background: #1e293b;
+            color: #fff;
+            transform: none;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            padding: 14px 18px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            border: 1px solid #334155;
+        }
+
+        .user-info-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar-small {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #38bdf8;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+        }
+
+        .jeton-badge {
+            background: linear-gradient(135deg, #facc15, #ca8a04);
+            color: #000;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            box-shadow: 0 4px 10px rgba(250, 204, 21, 0.3);
+        }
+
+        /* DUYURU BANNER */
+        .announcement-banner {
+            display: none;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 13px;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+            border: 1px solid #ef4444;
+            animation: pulseBanner 1.5s infinite alternate;
+        }
+        @keyframes pulseBanner {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.02); }
+        }
+
+        /* ETKİNLİK BANNER */
+        .event-banner {
+            display: none;
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            color: #fff;
+            padding: 14px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+            text-align: center;
+            border: 2px solid #a78bfa;
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+        }
+
+        .notice-banner {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-left: 4px solid #38bdf8;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #cbd5e1;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 20px;
+            border-top: 1px solid #334155;
+            border-right: 1px solid #334155;
+            border-bottom: 1px solid #334155;
+        }
+
+        .card-box {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .chat-box {
+            height: 220px;
+            background: #0b0f19;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 12px;
+            overflow-y: auto;
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-msg {
+            background: #1e293b;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            position: relative;
+            border: 1px solid #334155;
+        }
+
+        .chat-msg .owner-tag {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            font-weight: bold;
+        }
+
+        .chat-msg .sender-name {
+            color: #38bdf8;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .gift-btn {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            font-size: 11px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            margin-left: 8px;
+            font-weight: bold;
+            box-shadow: 0 2px 6px rgba(139, 92, 246, 0.4);
+        }
+        .gift-btn:hover { opacity: 0.9; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 20px;
+            width: 92%;
+            max-width: 400px;
+            border: 1px solid #334155;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        .modal-avatar {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 12px; border: 3px solid #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+
+        .gift-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-height: 230px;
+            overflow-y: auto;
+            margin: 15px 0;
+            padding-right: 4px;
+        }
+        .gift-item-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 12px 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+        .gift-item-card:hover {
+            border-color: #8b5cf6;
+            background: #1e1b4b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
+        }
+        .gift-emoji-icon {
+            font-size: 30px;
+            margin-bottom: 4px;
+            display: block;
+        }
+        .gift-name-text {
+            font-size: 11px;
+            font-weight: bold;
+            color: #f1f5f9;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .gift-cost-text {
+            font-size: 11px;
+            color: #facc15;
+            font-weight: bold;
+        }
+
+        .order-options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .order-card-option {
+            background: #0f172a;
+            border: 2px solid #334155;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .order-card-option:hover {
+            border-color: #38bdf8;
+            background: #0c4a6e;
+        }
+        .order-card-option.selected {
+            border-color: #38bdf8;
+            background: linear-gradient(135deg, #0369a1, #0284c7);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+        .order-count {
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .order-price {
+            font-size: 12px;
+            color: #facc15;
+            font-weight: bold;
+        }
+
+        #giftEffectOverlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
+        }
+
+        .gift-popup-card {
+            background: linear-gradient(135deg, #7c3aed, #2563eb);
+            padding: 25px 45px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(139, 92, 246, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transform: scale(0);
+            animation: modernGiftPop 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes modernGiftPop {
+            0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+            30% { transform: scale(1.15) rotate(5deg); opacity: 1; }
+            45% { transform: scale(0.95) rotate(-3deg); opacity: 1; }
+            60% { transform: scale(1) rotate(0deg); opacity: 1; }
+            85% { transform: scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: scale(0.5) rotate(15deg); opacity: 0; }
+        }
+
+        .effect-icon-animated {
+            font-size: 65px;
+            display: inline-block;
+            animation: bounceEmoji 1.2s infinite alternate ease-in-out;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3));
+        }
+
+        @keyframes bounceEmoji {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-12px) scale(1.1); }
+        }
+
+        .wheel-container {
+            text-align: center;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+        .wheel-box {
+            font-size: 45px;
+            margin: 10px 0;
+            min-height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .bet-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .bet-btn {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .bet-btn.selected {
+            border-color: #38bdf8;
+            background: #0369a1;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div id="giftEffectOverlay">
+    <div class="gift-popup-card">
+        <div id="effectEmoji" class="effect-icon-animated">🎁</div>
+        <p id="effectText" style="margin-top:12px; color:#fff; font-size:15px; font-weight:bold; line-height: 1.4; text-shadow: 0 2px 4px rgba(0,0,0,0.3);"></p>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- 1. GİRİŞ EKRANI -->
+    <div id="authScreen" class="screen active">
+        <h2>🌐 Google Hesabı ilə Giriş</h2>
+        <div style="text-align:center; margin-bottom:20px; font-size:28px;">🔑</div>
+        <input type="text" id="regName" placeholder="Adınızı daxil edin" autocomplete="off">
+        <input type="password" id="regPass" placeholder="Şifrə təyin edin" autocomplete="new-password">
+        <input type="text" id="regAvatar" placeholder="Profil şəklinin linki (URL)" autocomplete="off">
+        <button onclick="registerUser()">OK / Giriş Et</button>
+        <button class="secondary-btn" onclick="openAdminLogin()">Admin Giriş Yerə Keç</button>
+    </div>
+
+    <!-- 2. ADMİN GİRİŞİ -->
+    <div id="adminLoginScreen" class="screen">
+        <h2>🛡️ Admin Giriş</h2>
+        <input type="text" id="adminUser" placeholder="İstifadəçi adı" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+        <input type="password" id="adminPass" placeholder="Şifrə" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');">
+        <button onclick="loginAdmin()">Admin olaraq daxil ol</button>
+        <button class="secondary-btn" onclick="showScreen('authScreen')">Geri qayıt</button>
+    </div>
+
+    <!-- 3. ƏSAS PANEL -->
+    <div id="mainScreen" class="screen">
+        
+        <!-- DUYURU BANNER -->
+        <div id="announcementBanner" class="announcement-banner">
+            📢 <b>ÖZEL DUYURU:</b> <span id="announcementText"></span>
+        </div>
+
+        <!-- ETKİNLİK BANNER -->
+        <div id="eventBanner" class="event-banner">
+            <h4 id="eventTitle" style="font-size: 14px; margin-bottom: 6px; color:#facc15;">🎉 Yeni Etkinlik Başladı!</h4>
+            <p id="eventTimer" style="font-size: 12px; margin-bottom: 10px; color:#e2e8f0;">Qalan vaxt: 10 saniyə</p>
+            <button id="eventJoinBtn" onclick="participateEvent()" style="background: linear-gradient(135deg, #facc15, #ca8a04); color:#000; font-size: 13px; padding: 10px; margin-bottom:0;">Qatılmaq (10 Jeton verilir!)</button>
+        </div>
+
+        <div class="top-bar">
+            <div class="user-info-area">
+                <img id="headerAvatar" class="user-avatar-small" src="" alt="Profil" onclick="openProfileEditModal()" title="Profili dəyişmək üçün kliklə">
+                <div>
+                    <div id="headerName" style="font-weight: bold; font-size: 14px;">Ad</div>
+                    <div style="font-size: 11px; color: #94a3b8;" id="headerRole">İstifadəçi</div>
+                </div>
+            </div>
+            <div>
+                <span class="jeton-badge" id="headerJeton">0 Jeton</span>
+            </div>
+        </div>
+
+        <div class="notice-banner">
+            Jeton almaq üçün TikTok: <b>nell_rinthebest</b> yazın və DM gəlin.
+        </div>
+
+        <!-- ÇARX OYUNU -->
+        <div class="wheel-container">
+            <h3 style="font-size: 15px; margin-bottom: 8px;">🎡 Çarx Oyunu (Gündə 1 Dəfə)</h3>
+            <p style="font-size: 11px; color: #94a3b8; margin-bottom: 10px;">Jeton məbləğini seç və çarxı fırlat (70% Qələbə şansı!)</p>
+            
+            <div class="bet-buttons">
+                <button class="bet-btn selected" onclick="selectBet(5, this)">5</button>
+                <button class="bet-btn" onclick="selectBet(10, this)">10</button>
+                <button class="bet-btn" onclick="selectBet(50, this)">50</button>
+                <button class="bet-btn" onclick="selectBet(100, this)">100</button>
+            </div>
+
+            <div class="wheel-box" id="wheelDisplay">🍔 2x</div>
+            <button id="spinBtn" onclick="spinWheel()">Çarxı Fırlat</button>
+        </div>
+
+        <!-- İNSTAGRAM SİPARİŞ KARTI -->
+        <div class="card-box">
+            <h3 style="font-size: 16px; margin-bottom: 12px;">📸 Instagram Takipçi Siparişi</h3>
+            
+            <div class="order-options-grid" id="orderGrid">
+                <div class="order-card-option selected" onclick="selectPackage(5, 100, this)">
+                    <span class="order-count">100 Takipçi</span>
+                    <span class="order-price">5 Jeton</span>
+                </div>
+                <div class="order-card-option" onclick="selectPackage(10, 200, this)">
+                    <span class="order-count">200 Takipçi</span>
+                    <span class="order-price">10 Jeton</span>
+                </div>
+                <div class="order-card-option" onclick="selectPackage(15, 300, this)">
+                    <span class="order-count">300 Takipçi</span>
+                    <span class="order-price">15 Jeton</span>
+                </div>
+                <div class="order-card-option" onclick="selectPackage(25, 400, this)">
+                    <span class="order-count">400 Takipçi</span>
+                    <span class="order-price">25 Jeton</span>
+                </div>
+                <div class="order-card-option" onclick="selectPackage(30, 500, this)">
+                    <span class="order-count">500 Takipçi</span>
+                    <span class="order-price">30 Jeton</span>
+                </div>
+                <div class="order-card-option" onclick="selectPackage(40, 1000, this)">
+                    <span class="order-count">1000 Takipçi</span>
+                    <span class="order-price">40 Jeton</span>
+                </div>
+            </div>
+
+            <button onclick="makeOrder()">Sifarişi Təsdiqlə</button>
+        </div>
+
+        <!-- CHAT KARTI -->
+        <div class="card-box">
+            <h3 style="font-size: 16px; margin-bottom: 12px;">💬 Canlı Chat & Hədiyyələr</h3>
+            <div class="chat-box" id="chatBox"></div>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="chatInput" placeholder="Salam yazın..." style="margin-bottom:0;" autocomplete="off">
+                <button onclick="sendMessage()" style="width: 90px; margin-bottom:0;">Göndər</button>
+            </div>
+        </div>
+
+        <!-- ADMİN İDARƏETMƏ -->
+        <div id="adminPanelArea" class="card-box" style="display:none; background:#172554; border-color:#1d4ed8;">
+            <h3 style="font-size: 15px; color:#38bdf8; margin-bottom:10px;">👑 Nell Admin Paneli</h3>
+            
+            <input type="text" id="targetUser" placeholder="İstifadəçinin adı" autocomplete="off" oninput="checkUserJetonAdmin()">
+            <div id="adminUserJetonInfo" style="font-size: 12px; color: #facc15; margin-bottom: 10px; font-weight: bold;"></div>
+            
+            <input type="number" id="targetJeton" placeholder="Atılacaq / Alınacaq jeton miqdarı" autocomplete="off">
+            <button onclick="adminGiveJeton()">Jeton Göndər / Düzəliş Et</button>
+
+            <hr style="border-color:#1e4ed8; margin: 15px 0;">
+            <h4 style="font-size: 13px; color:#38bdf8; margin-bottom:8px;">📢 Duyuru Göndər (Hər kəsdə görünəcək)</h4>
+            <input type="text" id="adminAnnouncementInput" placeholder="Duyuru mətnini yazın..." autocomplete="off">
+            <button onclick="sendAdminAnnouncement()">Duyurunu Paylaş</button>
+
+            <hr style="border-color:#1e4ed8; margin: 15px 0;">
+            <h4 style="font-size: 13px; color:#38bdf8; margin-bottom:8px;">🎉 10 Saniyəlik Etkinlik Başlat</h4>
+            <button onclick="startAdminEvent()" style="background: linear-gradient(135deg, #10b981, #059669); color:#fff;">10 Saniyəlik Etkinlik Başlat (+100 Jeton)</button>
+        </div>
+
+        <button class="secondary-btn" style="background:#ef4444; color:#fff; border:none;" onclick="logout()">Hesabdan Çıxış</button>
+    </div>
+
+</div>
+
+<!-- PROFİL VƏ HƏDİYYƏ GÖNDƏRMƏ MODALI -->
+<div id="profileModal" class="modal">
+    <div class="modal-content">
+        <img id="modalAvatar" class="modal-avatar" src="" alt="">
+        <h3 id="modalUsername" style="margin-bottom: 5px;">İstifadəçi</h3>
+        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">Hədiyyə seçin (Qəbul edən yarı qiymətini alacaq):</p>
+        
+        <div class="gift-grid" id="giftGrid"></div>
+
+        <button class="secondary-btn" onclick="closeModal()">Bağla</button>
+    </div>
+</div>
+
+<!-- PROFİLİ DƏYİŞDİRMƏ MODALI -->
+<div id="editProfileModal" class="modal">
+    <div class="modal-content">
+        <h3>Profil Məlumatlarını Yenilə</h3>
+        <input type="text" id="editName" placeholder="Yeni Ad">
+        <input type="password" id="editPass" placeholder="Yeni Şifrə">
+        <input type="text" id="editAvatar" placeholder="Yeni Şəkil Linki (URL)">
+        <button onclick="saveProfileChanges()">Yadda Saxla</button>
+        <button class="secondary-btn" onclick="closeEditModal()">Bağla</button>
+    </div>
+</div>
+
+<script>
+    let users = JSON.parse(localStorage.getItem('db_users')) || [];
+    let currentUser = JSON.parse(localStorage.getItem('db_current')) || null;
+    let messages = JSON.parse(localStorage.getItem('db_msgs')) || [];
+
+    const tiktokGifts = [
+        { name: "BMW Maşın", cost: 5, ownerGets: 3, emoji: "🚗" },
+        { name: "Balina", cost: 10, ownerGets: 7, emoji: "🐋" },
+        { name: "Qırmızı Gül", cost: 1, ownerGets: 1, emoji: "🌹" },
+        { name: "Piknik Səbəti", cost: 25, ownerGets: 12, emoji: "🧺" },
+        { name: "Donut", cost: 30, ownerGets: 15, emoji: "🍩" },
+        { name: "Panda", cost: 50, ownerGets: 25, emoji: "🐼" },
+        { name: "Aslan", cost: 100, ownerGets: 50, emoji: "🦁" },
+        { name: "Yarasa", cost: 200, ownerGets: 100, emoji: "🦇" },
+        { name: "TikTok Kainatı", cost: 1000, ownerGets: 500, emoji: "🌌" }
+    ];
+
+    const wheelItems = [
+        { emoji: "🍔", name: "Hamburger", multiplier: 2 },
+        { emoji: "🍕", name: "Pizza", multiplier: 2 },
+        { emoji: "🥤", name: "Kola", multiplier: 1.5 },
+        { emoji: "❌", name: "Uduzdun", multiplier: 0 }
+    ];
+
+    let selectedTargetUser = null;
+    let selectedBetAmount = 5;
+    let selectedPackageCost = 5;
+    let selectedPackageCount = 100;
+
+    if (currentUser) {
+        let found = users.find(u => u.name === currentUser.name);
+        if (found) {
+            currentUser = found;
+            localStorage.setItem('db_current', JSON.stringify(currentUser));
+        } else {
+            users.push(currentUser);
+            saveData();
+        }
+        showScreen('mainScreen');
+        updateUI();
+    }
+
+    // Real vaxt yenilənmə
+    setInterval(() => {
+        if (!currentUser) return;
+        
+        users = JSON.parse(localStorage.getItem('db_users')) || [];
+        let fresh = users.find(u => u.name === currentUser.name);
+        if (fresh) {
+            currentUser = fresh;
+            localStorage.setItem('db_current', JSON.stringify(currentUser));
+            document.getElementById('headerJeton').innerText = currentUser.isAdmin ? 'Sonsuz Jeton' : currentUser.jeton + ' Jeton';
+        }
+
+        let globalAnnouncement = localStorage.getItem('db_announcement');
+        let banner = document.getElementById('announcementBanner');
+        if (globalAnnouncement) {
+            document.getElementById('announcementText').innerText = globalAnnouncement;
+            banner.style.display = 'block';
+        } else {
+            banner.style.display = 'none';
+        }
+
+        checkActiveEvent();
+    }, 1000);
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function openAdminLogin() {
+        document.getElementById('adminUser').value = '';
+        document.getElementById('adminPass').value = '';
+        showScreen('adminLoginScreen');
+    }
+
+    function registerUser() {
+        let name = document.getElementById('regName').value.trim();
+        let pass = document.getElementById('regPass').value.trim();
+        let avatar = document.getElementById('regAvatar').value.trim() || 'https://via.placeholder.com/80';
+
+        if (!name || !pass) {
+            alert('Zəhmət olmasa ad və şifrə daxil edin!');
+            return;
+        }
+
+        if (name.toLowerCase() === 'nell') {
+            alert('Bu ad yalnız admin üçündür! Admin girişindən istifadə edin.');
+            return;
+        }
+
+        users = JSON.parse(localStorage.getItem('db_users')) || [];
+        let existing = users.find(u => u.name === name);
+        if (existing) {
+            if (existing.pass !== pass) {
+                alert('Şifrə yanlışdır!');
+                return;
+            }
+            currentUser = existing;
+        } else {
+            currentUser = {
+                name: name,
+                pass: pass,
+                avatar: avatar,
+                jeton: 10,
+                isAdmin: false,
+                lastSpinDate: ''
+            };
+            users.push(currentUser);
+        }
+
+        saveData();
+
+        let hasSaidHello = messages.some(m => m.name === currentUser.name);
+        if (!hasSaidHello) {
+            messages.push({
+                name: currentUser.name,
+                avatar: currentUser.avatar || 'https://via.placeholder.com/80',
+                text: 'Salam!',
+                isAdmin: currentUser.isAdmin
+            });
+            if (messages.length > 50) messages.shift();
+            localStorage.setItem('db_msgs', JSON.stringify(messages));
+        }
+
+        showScreen('mainScreen');
+        updateUI();
+    }
+
+    function loginAdmin() {
+        let user = document.getElementById('adminUser').value.trim();
+        let pass = document.getElementById('adminPass').value.trim();
+
+        if (user === 'nell' && pass === 'nell92477') {
+            currentUser = {
+                name: 'nell',
+                pass: 'nell92477',
+                avatar: 'https://via.placeholder.com/80/38bdf8/0f172a?text=N',
+                jeton: 999999,
+                isAdmin: true,
+                lastSpinDate: ''
+            };
+            users = JSON.parse(localStorage.getItem('db_users')) || [];
+            let adminIndex = users.findIndex(u => u.name === 'nell');
+            if (adminIndex === -1) {
+                users.push(currentUser);
+            } else {
+                users[adminIndex] = currentUser;
+            }
+            saveData();
+
+            showScreen('mainScreen');
+            updateUI();
+        } else {
+            alert('Yanlış admin məlumatları!');
+        }
+    }
+
+    function updateUI() {
+        document.getElementById('headerName').innerText = currentUser.name;
+        document.getElementById('headerAvatar').src = currentUser.avatar || 'https://via.placeholder.com/80';
+        document.getElementById('headerJeton').innerText = currentUser.isAdmin ? 'Sonsuz Jeton' : currentUser.jeton + ' Jeton';
+        document.getElementById('headerRole').innerText = currentUser.isAdmin ? 'Owner (Admin)' : 'İstifadəçi';
+
+        if (currentUser.isAdmin) {
+            document.getElementById('adminPanelArea').style.display = 'block';
+        } else {
+            document.getElementById('adminPanelArea').style.display = 'none';
+        }
+        renderChat();
+    }
+
+    function logout() {
+        localStorage.removeItem('db_current');
+        currentUser = null;
+        document.getElementById('adminUser').value = '';
+        document.getElementById('adminPass').value = '';
+        document.getElementById('regName').value = '';
+        document.getElementById('regPass').value = '';
+        document.getElementById('regAvatar').value = '';
+        showScreen('authScreen');
+    }
+
+    function checkUserJetonAdmin() {
+        let tName = document.getElementById('targetUser').value.trim();
+        let infoDiv = document.getElementById('adminUserJetonInfo');
+        if (!tName) {
+            infoDiv.innerText = '';
+            return;
+        }
+        users = JSON.parse(localStorage.getItem('db_users')) || [];
+        let target = users.find(u => u.name.toLowerCase() === tName.toLowerCase());
+        if (target) {
+            infoDiv.innerText = `🔍 Tapıldı: "${target.name}" istifadəçisinin hazırda ${target.jeton} jetonu var.`;
+        } else {
+            infoDiv.innerText = '⚠️ Belə istifadəçi tapılmadı.';
+        }
+    }
+
+    // Duyuru Göndər (Saat və saniyə qeydi ilə)
+    function sendAdminAnnouncement() {
+        let text = document.getElementById('adminAnnouncementInput').value.trim();
+        if (!text) {
+            alert('Zəhmət olmasa duyuru mətni daxil edin!');
+            return;
+        }
+
+        let now = new Date();
+        let timeString = now.toLocaleTimeString(); // Məsələn: 20:15:42
+        let fullAnnouncement = `${text} (Saat: ${timeString})`;
+
+        localStorage.setItem('db_announcement', fullAnnouncement);
+        
+        messages = JSON.parse(localStorage.getItem('db_msgs')) || [];
+        messages.push({
+            name: '📢 ÖZEL DUYURU',
+            avatar: '',
+            text: fullAnnouncement,
+            isAdmin: true
+        });
+        localStorage.setItem('db_msgs', JSON.stringify(messages));
+        
+        document.getElementById('adminAnnouncementInput').value = '';
+        alert(`Duyuru uğurla paylaşıldı! Vaxt: ${timeString}`);
+    }
+
+    function startAdminEvent() {
+        let endTime = Date.now() + 10000;
+        let eventData = {
+            endTime: endTime,
+            active: true,
+            participated: []
+        };
+        localStorage.setItem('db_event', JSON.stringify(eventData));
+
+        messages = JSON.parse(localStorage.getItem('db_msgs')) || [];
+        messages.push({
+            name: '🎉 ETKİNLİK',
+            avatar: '',
+            text: 'Yeni 10 saniyəlik sürətli jeton etkinliyi başladı! Yuxarıdan qatılmağa tələsin (+100 Jeton)!',
+            isAdmin: true
+        });
+        localStorage.setItem('db_msgs', JSON.stringify(messages));
+
+        alert('10 saniyəlik etkinlik başladıldı!');
+    }
+
+    function checkActiveEvent() {
+        let eventRaw = localStorage.getItem('db_event');
+        let banner = document.getElementById('eventBanner');
+        if (!eventRaw) {
+            banner.style.display = 'none';
+            return;
+        }
+
+        let ev = JSON.parse(eventRaw);
+        let timeLeft = Math.floor((ev.endTime - Date.now()) / 1000);
+
+        if (timeLeft > 0 && ev.active) {
+            banner.style.display = 'block';
+            document.getElementById('eventTimer').innerText = `Qalan vaxt: ${timeLeft} saniyə`;
+            
+            let joinBtn = document.getElementById('eventJoinBtn');
+            if (ev.participated && ev.participated.includes(currentUser.name)) {
+                joinBtn.innerText = 'Qatıldınız ✅ (+100 Jeton)';
+                joinBtn.disabled = true;
+                joinBtn.style.opacity = '0.6';
+            } else {
+                joinBtn.innerText = 'Qatılmaq (100 Jeton Al!)';
+                joinBtn.disabled = false;
+                joinBtn.style.opacity = '1';
+            }
+        } else {
+            banner.style.display = 'none';
+            if (ev.active) {
+                ev.active = false;
+                localStorage.setItem('db_event', JSON.stringify(ev));
+            }
+        }
+    }
+
+    function participateEvent() {
+        let eventRaw = localStorage.getItem('db_event');
+        if (!eventRaw) return;
+        let ev = JSON.parse(eventRaw);
+
+        if (Date.now() >= ev.endTime) {
+            alert('Etkinlik bitdi!');
+            return;
+        }
+
+        if (ev.participated && ev.participated.includes(currentUser.name)) {
+            alert('Siz artıq bu etkinliyə qatılmısınız!');
+            return;
+        }
+
+        currentUser.jeton += 100;
+        updateUserInStorage();
+        updateUI();
+
+        if (!ev.participated) ev.participated = [];
+        ev.participated.push(currentUser.name);
+        localStorage.setItem('db_event', JSON.stringify(ev));
+
+        alert('Təbriklər! Etkinliyə qatıldınız və balansınıza +100 Jeton əlavə olundu!');
+    }
+
+    function selectBet(amount, btn) {
+        selectedBetAmount = amount;
+        document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+    }
+
+    function selectPackage(cost, amount, card) {
+        selectedPackageCost = cost;
+        selectedPackageCount = amount;
+        document.querySelectorAll('.order-card-option').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+    }
+
+    function spinWheel() {
+        let today = new Date().toDateString();
+        if (!currentUser.isAdmin && currentUser.lastSpinDate === today) {
+            alert('Gündə yalnız 1 dəfə çarxı fırlada bilərsiniz! Sabah yenidən cəhd edin.');
+            return;
+        }
+
+        if (!currentUser.isAdmin && currentUser.jeton < selectedBetAmount) {
+            alert('Seçdiyiniz məbləğ üçün yetərli jetonunuz yoxdur!');
+            return;
+        }
+
+        if (!currentUser.isAdmin) {
+            currentUser.jeton -= selectedBetAmount;
+        }
+
+        currentUser.lastSpinDate = today;
+        updateUserInStorage();
+        updateUI();
+
+        let display = document.getElementById('wheelDisplay');
+        let spinBtn = document.getElementById('spinBtn');
+        spinBtn.disabled = true;
+
+        let counter = 0;
+        let interval = setInterval(() => {
+            let randomItem = wheelItems[Math.floor(Math.random() * wheelItems.length)];
+            display.innerHTML = `${randomItem.emoji} ${randomItem.name}`;
+            counter++;
+            if (counter > 15) {
+                clearInterval(interval);
+                
+                let isWin = Math.random() < 0.7;
+                let finalItem;
+
+                if (isWin) {
+                    let winningItems = wheelItems.filter(i => i.multiplier > 0);
+                    finalItem = winningItems[Math.floor(Math.random() * winningItems.length)];
+                    let winnings = Math.floor(selectedBetAmount * finalItem.multiplier);
+                    if (!currentUser.isAdmin) {
+                        currentUser.jeton += winnings;
+                    }
+                    display.innerHTML = `${finalItem.emoji} +${winnings} Jeton!`;
+                    alert(`Təbriklər! Qazandınız: ${winnings} jeton.`);
+                } else {
+                    finalItem = wheelItems.find(i => i.multiplier === 0);
+                    display.innerHTML = `${finalItem.emoji} Uduzdun`;
+                    alert('Təəssüf ki, bu dəfə uduzdunuz.');
+                }
+
+                updateUserInStorage();
+                updateUI();
+                spinBtn.disabled = false;
+            }
+        }, 100);
+    }
+
+    function openProfileEditModal() {
+        document.getElementById('editName').value = currentUser.name;
+        document.getElementById('editPass').value = currentUser.pass;
+        document.getElementById('editAvatar').value = currentUser.avatar;
+        document.getElementById('editProfileModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editProfileModal').style.display = 'none';
+    }
+
+    function saveProfileChanges() {
+        let newName = document.getElementById('editName').value.trim();
+        let newPass = document.getElementById('editPass').value.trim();
+        let newAvatar = document.getElementById('editAvatar').value.trim();
+
+        if (!newName || !newPass) {
+            alert('Ad və şifrə boş ola bilməz!');
+            return;
+        }
+
+        let oldName = currentUser.name;
+        currentUser.name = newName;
+        currentUser.pass = newPass;
+        currentUser.avatar = newAvatar || 'https://via.placeholder.com/80';
+
+        users = JSON.parse(localStorage.getItem('db_users')) || [];
+        let idx = users.findIndex(u => u.name === oldName);
+        if (idx !== -1) {
+            users[idx] = currentUser;
+        } else {
+            users.push(currentUser);
+        }
+
+        updateUserInStorage();
+        updateUI();
+        closeEditModal();
+        alert('Profil məlumatlarınız uğurla yeniləndi!');
+    }
+
+    function makeOrder() {
+        let cost = selectedPackageCost;
+        if (!currentUser.isAdmin && currentUser.jeton < cost) {
+            alert('Yetərli jetonunuz yoxdur! TikTok: nell_rinthebest yazaraq jeton əldə edə bilərsiniz.');
+            return;
+        }
+
+        let igAccount = prompt("Instagram hesabınızın adını (və ya profil linkini) daxil edin:");
+        if (!igAccount || igAccount.trim() === "") {
+            alert("Sifariş ləğv edildi: Instagram hesabı daxil edilmədi.");
+            return;
+        }
+
+        if (!currentUser.isAdmin) {
+            currentUser.jeton -= cost;
+            updateUserInStorage();
+        }
+
+        messages = JSON.parse(localStorage.getItem('db_msgs')) || [];
+        messages.push({
+            name: '🔔 Sifariş Bildirişi',
+            avatar: '',
+            text: `İstifadəçi "${currentUser.name}" 👉 ${selectedPackageCount} Takipçi sifariş verdi! Instagram hesab: @${igAccount.trim()}`,
+            isAdmin: true
+        });
+        if (messages.length > 50) messages.shift();
+        localStorage.setItem('db_msgs', JSON.stringify(messages));
+
+        alert('Sifarişiniz uğurla qəbul olundu və admimə bildiriş göndərildi!');
+        updateUI();
+    }
+
+    function adminGiveJeton() {
+        let tName = document.getElementById('targetUser').value.trim();
+        let amount = parseInt(document.getElementById('targetJeton').value);
+
+        if (!tName || isNaN(amount)) {
+            alert('Zəhmət olmasa istifadəçi adı və düzgün jeton miqdarı daxil edin!');
+            return;
+        }
+
+        users = JSON.parse(localStorage.getItem('db_users')) || [];
+        let target = users.find(u => u.name.toLowerCase() === tName.toLowerCase());
+        if (target) {
+            target.jeton += amount;
+            saveData();
+            alert(`${target.name} istifadəçisinin balansına ${amount} jeton əlavə edildi/çıxarıldı. Yeni balans: ${target.jeton}`);
+            document.getElementById('targetUser').value = '';
+            document.getElementById('targetJeton').value = '';
+            document.getElementById('adminUserJetonInfo').innerText = '';
+        } else {
+            alert('Belə bir istifadəçi tapılmadı!');
+        }
+    }
+
+    function sendMessage() {
+        let text = document.getElementById('chatInput').value.trim();
+        if (!text) return;
+
+        users = JSON.parse(localStorage.getItem('db_users')) || [];
+        let existingUser = users.find(u => u.name === currentUser.name);
+        if (!existingUser) {
+            users.push(currentUser);
+            saveData();
+        }
+
+        messages = JSON.parse(localStorage.getItem('db_msgs')) || [];
+        messages.push({
+            name: currentUser.name,
+            avatar: currentUser.avatar || 'https://via.placeholder.com/80',
+            text: text,
+            isAdmin: currentUser.isAdmin
+        });
+
+        if (messages.length > 50) messages.shift();
+        localStorage.setItem('db_msgs', JSON.stringify(messages));
+        document.getElementById('chatInput').value = '';
+        renderChat();
+    }
+
+    function renderChat() {
+        messages = JSON.parse(localStorage.getItem('db_msgs')) || [];
+        let box = document.getElementById('chatBox');
+        box.innerHTML = '';
+        messages.forEach(m => {
+            let div = document.createElement('div');
+            div.className = 'chat-msg';
+            
+            if (m.name === '🔔 Sifariş Bildirişi') {
+                div.style.background = '#1e1b4b';
+                div.style.borderColor = '#7c3aed';
+                div.innerHTML = `<b style="color: #facc15;">${m.name}:</b> <span style="color: #fff;">${m.text}</span>`;
+            } else if (m.name === '📢 ÖZEL DUYURU' || m.name === '🎉 ETKİNLİK') {
+                div.style.background = '#450a0a';
+                div.style.borderColor = '#dc2626';
+                div.innerHTML = `<b style="color: #f87171;">${m.name}:</b> <span style="color: #fff;">${m.text}</span>`;
+            } else {
+                let ownerTag = m.isAdmin ? '<span class="owner-tag">Owner</span>' : '';
+                div.innerHTML = `
+                    <span class="sender-name" onclick="openProfile('${m.name}', '${m.avatar}')">${m.name}</span> 
+                    ${ownerTag}: ${m.text}
+                    <button class="gift-btn" onclick="openProfile('${m.name}', '${m.avatar}')">Hədiyyə At 🎁</button>
+                `;
+            }
+            box.appendChild(div);
+        });
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function openProfile(name, avatar) {
+        if (name === currentUser.name) {
+            alert('Özünüzə hədiyyə ata bilməzsiniz!');
+            return;
+        }
+        
+        users = JSON.parse(localStorage.getItem('db_users')) || [];
+        let verifyTarget = users.find(u => u.name === name);
+        if (!verifyTarget && name !== 'nell') {
+            let newTarget = {
+                name: name,
+                pass: '12345',
+                avatar: avatar || 'https://via.placeholder.com/80',
+                jeton: 10,
+                isAdmin: false,
+                lastSpinDate: ''
+            };
+            users.push(newTarget);
+            saveData();
+        }
+
+        selectedTargetUser = name;
+        document.getElementById('modalUsername').innerText = name;
+        document.getElementById('modalAvatar').src = avatar || 'https://via.placeholder.com/80';
+
+        let grid = document.getElementById('giftGrid');
+        grid.innerHTML = '';
+
+        tiktokGifts.forEach(g => {
+            let item = document.createElement('div');
+            item.className = 'gift-item-card';
+            item.innerHTML = `
+                <span class="gift-emoji-icon">${g.emoji}</span>
+                <span class="gift-name-text">${g.name}</span>
+                <span class="gift-cost-text">${g.cost} Jeton</span>
+            `;
+            item.onclick = () => sendGift(g);
+            grid.appendChild(item);
+        });
+
+        document.getElementById('profileModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('profileModal').style.display = 'none';
+    }
+
+    function sendGift(gift) {
+        if (!currentUser.isAdmin && currentUser.jeton < gift.cost) {
+            alert('Bu hədiyyəni atmaq üçün yetərli jetonunuz yoxdur!');
+            return;
+        }
+
+        users = JSON.parse(localStorage.getItem('db_users')) || [];
+        let targetUserObj = users.find(u => u.name === selectedTargetUser);
+        
+        if (!targetUserObj) {
+            alert('Belə bir istifadəçi tapılmadı!');
+            closeModal();
+            return;
+        }
+
+        if (!currentUser.isAdmin) {
+            currentUser.jeton -= gift.cost;
+        }
+        targetUserObj.jeton += gift.ownerGets;
+
+        if (currentUser.name === targetUserObj.name) {
+            currentUser.jeton = targetUserObj.jeton;
+        }
+
+        saveData();
+        updateUI();
+        closeModal();
+
+        triggerGiftEffect(gift);
+
+        messages = JSON.parse(localStorage.getItem('db_msgs')) || [];
+        messages.push({
+            name: '🔔 Sifariş Bildirişi',
+            avatar: '',
+            text: `🎁 ${currentUser.name} ➔ ${selectedTargetUser} istifadəçisinə ${gift.emoji} ${gift.name} hədiyyə göndərdi!`,
+            isAdmin: false
+        });
+        localStorage.setItem('db_msgs', JSON.stringify(messages));
+        renderChat();
+    }
+
+    function triggerGiftEffect(gift) {
+        let overlay = document.getElementById('giftEffectOverlay');
+        let emojiDiv = document.getElementById('effectEmoji');
+        let textDiv = document.getElementById('effectText');
+
+        emojiDiv.innerText = gift.emoji;
+        textDiv.innerHTML = `<span style="color:#38bdf8;">${currentUser.name}</span> ➔ <span style="color:#facc15;">${selectedTargetUser}</span><br><b>${gift.name}</b> hədiyyəsi atıldı!`;
+
+        overlay.style.display = 'flex';
+
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 2500);
+    }
+
+    function updateUserInStorage() {
+        if (!currentUser.isAdmin) {
+            users = JSON.parse(localStorage.getItem('db_users')) || [];
+            let idx = users.findIndex(u => u.name === currentUser.name);
+            if (idx !== -1) {
+                users[idx] = currentUser;
+            } else {
+                users.push(currentUser);
+            }
+        }
+        saveData();
+    }
+
+    function saveData() {
+        localStorage.setItem('db_users', JSON.stringify(users));
+        localStorage.setItem('db_current', JSON.stringify(currentUser));
+    }
+</script>
+
+</body>
+</html>
